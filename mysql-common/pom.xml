@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>mysql</artifactId>
+        <groupId>com.song.yuqi</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>mysql-common</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.calcite</groupId>
+            <artifactId>calcite-core</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javacc-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>javacc</id>
+                        <goals>
+                            <goal>javacc</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${project.build.directory}/generated-sources/fmpp</sourceDirectory>
+                            <includes>
+                                <include>**/Parser.jj</include>
+                            </includes>
+                            <lookAhead>2</lookAhead>
+                            <isStatic>false</isStatic>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>javacc-test</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>javacc</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${project.build.directory}/generated-test-sources/fmpp</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-test-sources/javacc</outputDirectory>
+                            <includes>
+                                <include>**/Parser.jj</include>
+                            </includes>
+                            <lookAhead>2</lookAhead>
+                            <isStatic>false</isStatic>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!--
+            see https://javalibs.com/artifact/org.apache.drill.tools/drill-fmpp-maven-plugin
+            -->
+            <plugin>
+                <groupId>org.apache.drill.tools</groupId>
+                <artifactId>drill-fmpp-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <config>src/main/codegen/config.fmpp</config>
+                            <output>${project.build.directory}/generated-sources/fmpp</output>
+                            <templates>src/main/codegen/templates</templates>
+                        </configuration>
+                        <id>generate-fmpp-sources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+
+                    <!--<execution>-->
+                        <!--<configuration>-->
+                            <!--<config>src/test/codegen/config.fmpp</config>-->
+                            <!--<templates>src/main/codegen/templates</templates>-->
+                            <!--<output>${project.build.directory}/generated-test-sources/fmpp</output>-->
+                            <!--<scope>test</scope>-->
+                        <!--</configuration>-->
+                        <!--<id>generate-fmpp-test-sources</id>-->
+                        <!--<phase>validate</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>generate</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                </executions>
+            </plugin>
+
+        </plugins>
+
+
+        <!--
+            this is to copy file to target/class directory
+        -->
+        <resources>
+            <resource>
+            <!-- Copy freemarker template and fmpp configuration files of
+                 Calcite's SQL parser to allow clients to extend parser. -->
+                <directory>${basedir}/src/main/codegen</directory>
+                <targetPath>codegen</targetPath>
+            </resource>
+        </resources>
+    </build>
+
+</project>
