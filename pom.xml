@@ -11,6 +11,7 @@
     <modules>
         <module>mysql-front</module>
         <module>mysql-common</module>
+        <module>mysql-storage</module>
     </modules>
 
     <properties>
