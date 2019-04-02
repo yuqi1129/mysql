@@ -113,6 +113,7 @@ import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.SourceStringReader;
 import org.apache.calcite.util.Util;
 import org.apache.calcite.util.trace.CalciteTrace;
+import com.song.yu.calcite.sqlnode.MySQLCreateDatabase;
 
 import org.slf4j.Logger;
 
@@ -981,6 +982,8 @@ SqlNode SqlStmt() :
         stmt = SqlMerge()
     |
         stmt = SqlProcedureCall()
+    |
+        stmt = SqlCreateDatabase()
     )
     {
         return stmt;
@@ -3618,6 +3621,19 @@ SqlDrop SqlDrop() :
     }
 }
 </#if>
+
+
+SqlNode SqlCreateDatabase() :
+{
+    String databaseName;
+}
+{
+    <CREATE> <DATABASE>
+    databaseName = Identifier()
+    {
+        return new MySQLCreateDatabase(databaseName, getPos());
+    }
+}
 
 /**
  * Parses a literal expression, allowing continued string literals.
