@@ -5,10 +5,8 @@ package com.song.yu.server;
  */
 
 import com.song.yu.procotol.ProtocolUtil;
-import com.song.yu.protocol.AuthPacket;
-import com.song.yu.protocol.HandshakePacket;
-import com.song.yu.protocol.OKPacket;
-import com.song.yu.protocol.QueryPacket;
+import com.song.yu.protocol.*;
+import com.song.yu.protocol.util.BufferUtil;
 import com.song.yu.query.QueryHandler;
 import com.song.yu.query.QueryInfo;
 
@@ -21,12 +19,14 @@ import java.nio.channels.SocketChannel;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.song.yu.protocol.constant.ServerStatus.SERVER_STATUS_AUTOCOMMIT;
 
 public class MysqlServer extends Thread {
 	private int port;
 	private volatile boolean isRunning = true;
+	private static final AtomicInteger i = new AtomicInteger(1);
 
 
 	private Set<SocketChannel> channels = new HashSet<SocketChannel>();
@@ -93,11 +93,25 @@ public class MysqlServer extends Thread {
 								content[i] = buffer.get();
 							}
 
-							queryPacket.read(content);
+							try {
+								queryPacket.read(content);
 
-							QueryInfo queryInfo = new QueryInfo(queryPacket, socketChannel, null);
+								QueryInfo queryInfo = new QueryInfo(queryPacket, socketChannel, null);
 
-							QueryHandler.getInstance().handle(queryInfo);
+								QueryHandler.getInstance().handle(queryInfo);
+							} catch (Exception e) {
+								ByteBuffer b = ByteBuffer.allocate(1000);
+
+								OKPacket okPacket = new OKPacket();
+								okPacket.affectedRows = 0;
+								okPacket.serverStatus = SERVER_STATUS_AUTOCOMMIT;
+								okPacket.insertId = i.getAndIncrement();
+								okPacket.packetId = (byte) i.getAndIncrement ();
+								okPacket.message = "Connect success".getBytes();
+
+								okPacket.write(b);
+								socketChannel.write(b);
+							}
 
 						} else {
 							buffer = ByteBuffer.allocate(1024);
@@ -117,17 +131,21 @@ public class MysqlServer extends Thread {
 							OKPacket okPacket = new OKPacket();
 							okPacket.affectedRows = 0;
 							okPacket.serverStatus = SERVER_STATUS_AUTOCOMMIT;
+							okPacket.insertId = i.getAndIncrement();
+							okPacket.packetId = (byte) i.getAndIncrement ();
 							okPacket.message = "Connect success".getBytes();
 							okPacket.write(buffer);
 							buffer.flip();
 							socketChannel.write(buffer);
 
-							channels.add(socketChannel);
+							if (socketChannel.isOpen() && socketChannel.isConnected()) {
+								channels.add(socketChannel);
+							}
 
 						}
 
-						socketChannel.read(buffer);
-						buffer.flip();
+//						socketChannel.read(buffer);
+//						buffer.flip();
 
 
 					}

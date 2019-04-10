@@ -5,6 +5,4 @@ package com.song.yu.calcite.parser;
  */
 
 public class MySqlParser {
-
-
 }

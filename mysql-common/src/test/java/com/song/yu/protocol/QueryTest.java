@@ -13,7 +13,6 @@ public class QueryTest {
         String password = "tdlab401";
         String dataBase = "data";
         String sqlStr = "SELECT name,author FROM `paper` limit 0,2;";
-
     }
 
 }

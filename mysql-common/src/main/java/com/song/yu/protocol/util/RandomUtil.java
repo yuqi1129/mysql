@@ -3,11 +3,6 @@ package com.song.yu.protocol.util;
 /**
  * 
  * <pre><b>a random util.</b></pre>
- * @author 
- * <pre>seaboat</pre>
- * <pre><b>email: </b>849586227@qq.com</pre>
- * <pre><b>blog: </b>http://blog.csdn.net/wangyangzhizhou</pre>
- * @version 1.0
  */
 public class RandomUtil {
 	private static final byte[] bytes = { '1', '2', '3', '4', '5', '6', '7',

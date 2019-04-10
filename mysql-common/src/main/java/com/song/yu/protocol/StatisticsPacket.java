@@ -7,11 +7,6 @@ import com.song.yu.protocol.util.BufferUtil;
 /**
  * 
  * <pre><b>statistics command packet.</b></pre>
- * @author 
- * <pre>seaboat</pre>
- * <pre><b>email: </b>849586227@qq.com</pre>
- * <pre><b>blog: </b>http://blog.csdn.net/wangyangzhizhou</pre>
- * @version 1.0
  * @see http://dev.mysql.com/doc/internals/en/com-statistics.html
  */
 public class StatisticsPacket extends MysqlPacket {

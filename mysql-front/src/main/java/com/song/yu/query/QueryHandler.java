@@ -4,7 +4,9 @@ package com.song.yu.query;
  * Date: 2019/2/20 下午3:17
  */
 
+import com.song.yu.protocol.ErrorPacket;
 import com.song.yu.protocol.OKPacket;
+import com.song.yu.protocol.QuitPacket;
 import com.song.yu.threadpool.MysqlThreadPool;
 
 import java.nio.ByteBuffer;
@@ -30,7 +32,7 @@ public class QueryHandler{
 	}
 
 
-	public void handle(QueryInfo queryInfo) {
+	public void handle(QueryInfo queryInfo) throws Exception {
 		String sql = new String(queryInfo.getQueryPacket().message);
 		String db = queryInfo.getDb();
 		SocketChannel channel = queryInfo.getSocketChannel();
@@ -49,6 +51,18 @@ public class QueryHandler{
 			//throw new IllegalArgumentException("can't find handler for '" + sql + "'");
 			//just return okPackage now
 
+			ErrorPacket errorPacket = new ErrorPacket();
+			errorPacket.errno = 1;
+			errorPacket.message = "can't handle this sql".getBytes();
+
+			ByteBuffer errorBuffer = ByteBuffer.allocate(1000);
+			errorPacket.write(errorBuffer);
+
+			channel.write(errorBuffer);
+
+
+
+			/**
 			try {
 				OKPacket okPacket = new OKPacket();
 				okPacket.affectedRows = 0;
@@ -59,12 +73,10 @@ public class QueryHandler{
 					channel.write(byteBuffer);
 				}
 
-				if (channel.isConnected()) {
-					channel.write(byteBuffer);
-				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			 */
 
 		}
 
